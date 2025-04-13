@@ -1,0 +1,7 @@
+name: windvoc-binder
+channels:
+  - conda-forge
+dependencies:
+  - python-build
+  - jupyter-server-proxy
+  - code-server >=3.2
