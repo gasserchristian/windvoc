@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/bootstrap4.0.0.min.css">
+    <link rel="stylesheet" href="./assets/tailwind.2.2.15.min.css">
+    <title>Dashboard</title>
+    <style>
+        .modal.create .update {
+            display: none;
+        }
+
+        .modal.update .create {
+            display: none;
+        }
+
+        .cross-container {
+            cursor: pointer;
+        }
+
+        .cross-container:hover::before,
+        .cross-container:hover::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-color: black;
+        }
+
+        .cross-container:hover::before {
+            width: 2px;
+            height: 16px;
+            transform: translate(-50%, -50%);
+        }
+
+        .cross-container:hover::after {
+            width: 16px;
+            height: 2px;
+            transform: translate(-50%, -50%);
+        }
+
+        .cross-container--permanent:before {
+            width: 2px;
+            height: 16px;
+            transform: translate(-50%, -50%);
+        }
+
+        .cross-container--permanent:after {
+            width: 16px;
+            height: 2px;
+            transform: translate(-50%, -50%);
+        }
+
+
+        .cross-container--permanent::before,
+        .cross-container--permanent::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-color: white;
+        }
+
+        /* Style for the range histogram */
+        .histogram {
+            width: 100%;
+        }
+
+        /* Style for the range slider */
+        .range-slider {
+            width: 100%;
+            height: 10px;
+            background-color: #f1f1f1;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        /* Style for the range line */
+        .range-slider .range-line {
+            height: 100%;
+            background-color: #4CAF50;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Style for the handles */
+        .range-slider .range-handle {
+            width: 20px;
+            height: 20px;
+            background-color: #4CAF50;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .edit,
+        .trash {
+            width: 32px;
+            position: absolute;
+            top: 3px;
+            right: 2px;
+            padding: 7px;
+        }
+
+        .trash {
+            right: 28px;
+        }
+
+        .edit svg,
+        .trash svg {
+            width: 100%;
+        }
+
+        .card .input-group {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            max-width: 120px;
+        }
+        div.stack-wrapper {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            position: absolute;
+            top: 0; left: 0;
+            box-sizing: border-box;
+            display: flex;
+        }
+        ul.card-deck {
+            position: relative;
+            width: 0;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            list-style-type: none;
+        }
+        ul.card-deck li {
+            position: absolute;
+            width: 300px;
+            height: 300PX;
+            background: white;
+            border: 1px solid black;
+            font-size: 2rem;
+            line-height: 1;
+        }
+        ul.card-deck li.wrong {
+            border: 1px solid #f55050;
+        }
+        ul.card-deck li.wrong:after {
+            position: absolute;
+            content: 'träna';
+            font-size: 6rem;
+            background: #ff000040;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: red;
+            font-weight: bold;
+        }
+        ul.card-deck li.right {
+            border: 1px solid #5eff5e
+        }
+        ul.card-deck li.right:after {
+            position: absolute;
+            content: 'tillykke';
+            font-size: 5rem;
+            background: #34b10091;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #34b100;
+            font-weight: bold;
+        }
+        ul.card-deck li div.front, ul.card-deck li div.rear {
+            position: absolute;
+            text-align: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        ul.card-deck li div.toggleSide {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+        }
+        ul.card-deck li div.toggleSide svg {
+            width: 100%;
+        }
+        ul.card-deck li svg.edit {
+            width: 32px;
+            position: absolute;
+            top: 3px;
+            left: 2px;
+            padding: 7px;
+        }
+        ul.card-deck li div.input-group {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            max-width: 120px;
+        }
+        ul.card-deck li div.input-group .btn {
+            z-index: auto;
+        }
+        .wrong {
+            background: red;
+        }
+        .right {
+            background: limegreen;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <aside class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-shrink-0">
+            <div class="py-4 text-gray-500 dark:text-gray-400 h-full flex flex-col" bis_skin_checked="1">
+                <a class="ml-6 text-lg font-bold text-gray-800 dark:text-gray-200" href="/">
+                    WindVoc
+                </a>
+                <ul class="mt-6">
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="index.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Dashboard</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="cloze.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Cloze</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <span
+                            class="absolute inset-y-0 left-0 w-1 bg-red-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
+                            <a class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100"
+                                href="cards.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Cards</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="matching.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Matching</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="dict.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                            <span class="ml-4">Dictionary</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="px-6 mt-auto" bis_skin_checked="1">
+                    <button id="createItemBtn"
+                        class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-red-600 border border-transparent rounded-lg active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-purple">
+                        Add word
+                        <span class="ml-2" aria-hidden="true">+</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content area -->
+        <div class="flex flex-col flex-1 w-0 overflow-hidden">
+            <!-- Top navigation -->
+            <header class="w-full py-4 bg-white shadow-md flex">
+                <button class="p-1 ml-1 rounded-md md:hidden focus:outline-none focus:shadow-outline-purple" aria-label="Menu"
+                    id="hamburger">
+                    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                <div class="flex items-center mr-2 w-full" bis_skin_checked="1">
+                    <div class="relative w-full max-w-xl mr-6 focus-within:text-purple-500" bis_skin_checked="1">
+                        <input
+                            class="ml-2 h-10 w-full pl-2 pr-2 text-gray-700 placeholder-gray-600 bg-gray-100 border-0 rounded-md form-input"
+                            type="text" placeholder="Search for words" aria-label="Search" id="searchWordDict">
+                    </div>
+                    <button class="btn btn-danger ml-auto" id="setLevelBtn">Level <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" viewBox="0 0 24 24" class="w-4 inline">
+                        <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+                    </svg></button>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 p-4 overflow-y-auto relative">
+                <div class="stack-wrapper">
+                    <ul class="card-deck" id="list-container"></ul>
+                </div>
+                <section class="actions">
+                    <!--<button class="att-traena btn btn-info"
+                        onclick="stack.getCards().forEach(item=>item.card.throwIn(0,0))">Restart</button>-->
+                    <button class="att-traena btn btn-danger rounded-full"><span>0</span></button>
+                    <button class="behaerskad btn btn-success rounded-full"><span>0</span></button>
+                </section>
+                <!-- Set Level Modal -->
+                <div id="setLevelModal" class="modal fade" tabindex="-1" role="dialog"
+                    aria-labelledby="updateItemModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="updateItemModalLabel">Set Level</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <svg class="histogram" viewBox="0 0 100 30"></svg>
+                                <div class="range-slider">
+                                    <div class="range-line"></div>
+                                    <div class="range-handle" id="lowerHandle"></div>
+                                    <div class="range-handle" id="upperHandle"></div>
+                                </div>
+                                <form>
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <label for="lowerLevel">Lower level:</label>
+                                            <input type="text" class="form-control" id="lowerLevel" required>
+                                        </div>
+                                        <div class="col">
+                                            <label for="upperLevel">Upper level:</label>
+                                            <input type="text" class="form-control" id="upperLevel" required>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+                                <button id="setLevelItemBtnModal" type="button" class="btn btn-danger">Set</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- Backdrop -->
+        <div class="backdrop bg-black bg-opacity-50 fixed h-full hidden mt-24 w-full"></div>
+    </div>
+
+    <!-- Update Item Modal reduced -->
+    <div id="updateItemModalReduced" class="modal fade" tabindex="-1" role="dialog"
+        aria-labelledby="updateItemReducedModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateItemModalReducedLabel">Update Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateItemForm">
+                        <div class="form-group">
+                            <label for="updateContent">Content:</label>
+                            <input type="text" class="form-control" id="updateContent" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateDefinition">Definition:</label>
+                            <textarea class="form-control" id="updateDefinition" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+                    <button id="updateItemBtnModal" type="button" class="btn btn-danger">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+    <script src="./assets/jquery-3.6.0.min.js"></script>
+    <script src="./assets/d3.v6.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script
+        src="./assets/bootstrap3-typeahead-4.0.2.min.js"></script>
+    <script src="./assets/swing-3.3.0-brugorolas.js" charset="utf-8"></script>
+    <script src="./assets/script.js" charset="utf-8"></script>
+    <script>
+        const editSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+            <path d="m402.3 344.9 32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174 402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/>
+        </svg>`;
+
+        const trashBinSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
+  <path fill="currentColor" d="M709.424 455.05v576q0 14-9 23t-23 9h-64q-14 0-23-9t-9-23v-576q0-14 9-23t23-9h64q14 0 23 9t9 23zm256 0v576q0 14-9 23t-23 9h-64q-14 0-23-9t-9-23v-576q0-14 9-23t23-9h64q14 0 23 9t9 23zm256 0v576q0 14-9 23t-23 9h-64q-14 0-23-9t-9-23v-576q0-14 9-23t23-9h64q14 0 23 9t9 23zm128 724v-948h-896v948q0 22 7 40.5t14.5 27q7.5 8.5 10.5 8.5h832q3 0 10.5-8.5t14.5-27q7-18.5 7-40.5zm-672-1076h448l-48-117q-7-9-17-11h-317q-10 2-17 11zm928 32v64q0 14-9 23t-23 9h-96v948q0 83-47 143.5t-113 60.5h-832q-66 0-113-58.5t-47-141.5v-952h-96q-14 0-23-9t-9-23v-64q0-14 9-23t23-9h309l70-167q15-37 54-63t79-26h320q40 0 79 26t54 63l70 167h309q14 0 23 9t9 23z"/>
+</svg>`
+
+
+        $(document).ready(function () {
+            // Initialize autocompletion research bar
+            $('#searchWordDict').typeahead({
+                displayText: d => d.content,
+                source: function (query, process) {
+                    return $.get('./voc/autocomplete', { pattern: query }, function (data) {
+                        return process(data);
+                    });
+                },
+                updater: d => {
+                    openUpdateModal(d.id)
+                    return d.content
+                }
+            });
+
+            // Add/Update modal initialization
+            initModal();
+
+            // Set level
+            $('#setLevelBtn').click(function () {
+                const url = new URL(window.location.href);
+                const searchParams = new URLSearchParams(url.search);
+                const lowerLevel = parseInt(searchParams.get('lowerLevel'));
+                const upperLevel = parseInt(searchParams.get('upperLevel'));
+                $('#setLevelModal #lowerLevel').val(lowerLevel);
+                $('#setLevelModal #upperLevel').val(upperLevel);
+                fetchHistogramLevel()
+                $('#setLevelModal').modal('show');
+            })
+            $('#setLevelItemBtnModal').click(function () {
+                const lower = $('#setLevelModal #lowerLevel').val();
+                const upper = $('#setLevelModal #upperLevel').val();
+
+                if (parseInt(lower) <= parseInt(upper)) {
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('lowerLevel', lower);
+                    url.searchParams.set('upperLevel', upper);
+                    window.history.replaceState({}, '', url.toString());
+                    fetchAndPopulate();
+                    addParamsToUrl();
+                }
+                $('#setLevelModal').modal('hide');
+            })
+            fetchAndPopulate();
+
+            // put url parameters to all links in menu
+            addParamsToUrl()
+        });
+
+        // Init interaction modal
+        function initModal() {
+            // Initialize Typeahead
+            $('#createWord').typeahead({
+                displayText: d => d.content,
+                source: function (query, process) {
+                    return $.get('./voc/autocomplete', { pattern: query }, function (data) {
+                        return process(data);
+                    });
+                },
+                updater: d => {
+                    $('#createWordId').val(d.id)
+                    return d.content
+                }
+            });
+            // init add to dict modal
+            initModalAddToDict()
+        }
+
+        function initModalAddToDict() {
+            // Add modal
+            $('body').append($(getDictAddUpdateModal()))
+
+            // init update modal
+            $('#form-group-checkboxes').append(getFormTypeCheckboxes())
+
+            // Add word
+            $('#createItemBtn').click(function () {
+                $('#updateItemModal #updateContent').val('');
+                $('#updateItemModal input[name="updateType"]').prop('checked', false);
+                $('#updateItemModal #updateLevel').val(0);
+                $('#updateItemModal #updateDefinition').val('');
+                $('#updateItemModal #updateTags').val('');
+                $('#updateItemModal').removeClass('update');
+                $('#updateItemModal').addClass('create');
+                $('#updateItemModal').modal('show');
+            });
+            // Create button click event listener
+            $('#createItemDictBtnModal').click(function () {
+                var content = $('#updateItemModal #updateContent').val();
+                var type = $('#updateItemModal input[name="updateType"]:checked').val();
+                var level = $('#updateItemModal #updateLevel').val();
+                var definition = $('#updateItemModal #updateDefinition').val();
+                var tags = $('#updateItemModal #updateTags').val();
+
+                var item = {
+                    content: content,
+                    type: type,
+                    level: level,
+                    definition: definition,
+                    tags: tags
+                };
+
+                // Send POST request to create new item
+                $.ajax({
+                    url: './voc',
+                    type: 'POST',
+                    data: JSON.stringify(item),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        $('#updateItemModal').modal('hide');
+                        item.id = response.id;
+                        //addRows([item]);
+                    }
+                });
+            });
+            // Increase level button click event listener
+            $('#increaseLevel').click(function () {
+                var levelInput = $('#updateItemModal #updateLevel');
+                var level = parseInt(levelInput.val());
+                levelInput.val(level + 1);
+            });
+
+            // Decrease level button click event listener
+            $('#decreaseLevel').click(function () {
+                var levelInput = $('#updateItemModal #updateLevel');
+                var level = parseInt(levelInput.val());
+                if (level > 1) {
+                    levelInput.val(level - 1);
+                }
+            });
+        }
+
+        function openUpdateModal(rowId) {
+            $.ajax({
+                url: `voc/item/${rowId}`,
+                method: 'GET',
+                success: function (data) {
+                    var { content, type, level, definition, tags } = data;
+                    if (type > 8) type = 5;
+                    $('#updateItemModal #updateContent').val(content);
+                    $('#updateItemModal input[name="updateType"]').prop('checked', false);
+                    $('#updateItemModal input[name="updateType"]')[parseInt(type) - 1].checked = true;
+                    $('#updateItemModal #updateLevel').val(level);
+                    $('#updateItemModal #updateDefinition').val(definition);
+                    $('#updateItemModal #updateTags').val(tags);
+                    $('#updateItemModal').addClass('update');
+                    $('#updateItemModal').removeClass('create');
+                    $('#updateItemModal').modal('show');
+                    $('#updateItemDictBtnModal').off()
+                    $('#updateItemDictBtnModal').click(d => sendUpdate(rowId))
+                }
+            });
+        }
+        // Handling PUT
+        function sendUpdate(id) {
+            var content = $('#updateItemModal #updateContent').val();
+            var type = $('#updateItemModal input[name="updateType"]:checked').val();
+            var level = $('#updateItemModal #updateLevel').val();
+            var definition = $('#updateItemModal #updateDefinition').val();
+            var tags = $('#updateItemModal #updateTags').val();
+            var date = 'now';
+
+            var item = {
+                id,
+                content,
+                date,
+                type,
+                level,
+                tags,
+                definition
+            };
+
+            // Send PUT request to create new item
+            $.ajax({
+                url: `/voc/item/${id}`,
+                type: 'PUT',
+                data: JSON.stringify(item),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#updateItemModal').modal('hide');
+                    //updateRows([item]);
+                }
+            });
+        }
+
+        // card specific
+
+        // Trigger data fetch and populate structure
+        function fetchAndPopulate() {
+            // Get the bounds
+            const bounds = getLevelBounds();
+
+            // Fetch the data
+            $.ajax({
+                url: './voc',
+                method: 'GET',
+                data: bounds,
+                success: function (dataFetched) {
+                    data = fyShuffle(dataFetched);
+                    var $listContainer = $("#list-container");
+                    $listContainer.empty()
+                    generateItems($listContainer);
+                    initInteraction()
+                }
+            });
+        }
+        // Item
+        function generateItems($container) {
+            data.forEach(function (item) {
+                let $item = $('<li>')
+                $item.append(
+                    $('<div>', { class: 'id', style: 'display:none', text: item.id }),
+                    $('<div>', { class: 'front', style: 'display:none', text: item.content }),
+                    $('<div>', { class: 'rear', text: item.definition }),
+                    $('<svg class="edit" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="m402.3 344.9 32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174 402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/></svg>'),
+                    $('<div>', { class: 'toggleSide' }).append($('<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve"><g><path d="M897.7,490.4c-33,0-59.7,25.8-59.7,57.6c0,180.2-151.7,326.7-338,326.7c-186.4,0-338-146.5-338-326.7c0-180,151.6-326.6,338-326.6l0,0v96.1l238.6-153.8L500,10v96.1l0,0C247.9,106.1,42.7,304.4,42.7,548c0,243.7,205.2,442,457.3,442c252.1,0,457.3-198.3,457.3-442C957.3,516.1,930.7,490.4,897.7,490.4"/></g></svg>')),
+                    getLevelIncrementElement(item.id, item.level)
+                )
+                $container.append($item)
+            });
+        }
+        var stack
+        function initInteraction() {
+            // Turn card
+            $('.toggleSide').on('click', d => $('.front, .rear').toggle());
+
+            // Edit card
+            $('.edit').on('click', function () {
+                const $self = $(this).closest('li');
+                const $front = $self.find('.front');
+                const $rear = $self.find('.rear');
+                var id = $self.find('.id').text();
+                var content = $front.text();
+                var definition = $rear.text();
+
+                $('#updateItemModalReduced #updateContent').val(content);
+                $('#updateItemModalReduced #updateDefinition').val(definition);
+                $('#updateItemModalReduced').modal('show');
+                $('#updateItemModalReduced').find('#updateItemBtnModal').off();
+                $('#updateItemModalReduced').find('#updateItemBtnModal').on('click', d => updateReducedModal(id, function () {
+                    $front.text($('#updateItemModalReduced #updateContent').val());
+                    $rear.text($('#updateItemModalReduced #updateDefinition').val());
+                }));
+            });
+
+            // Init stack
+            const config = {
+                throwOutConfidence: (xOffset, yOffset, element) => {
+                    const xConfidence = Math.min(Math.abs(xOffset) / element.offsetWidth * 2, 1);
+                    const yConfidence = Math.min(Math.abs(yOffset) / element.offsetHeight * 2, 1);
+                    return Math.max(xConfidence, yConfidence);
+                }
+            }
+            stack = swing.Stack(config)
+            $('.card-deck li').each((i, el) => stack.createCard(el))
+
+            // Handle move card
+            var throwDirection = ''
+            stack.on('dragmove', d => {
+                const _direction = d.throwDirection,
+                    _self = d3.select(d.target)
+                if (_direction != throwDirection) {
+                    if (_direction == swing.Direction.RIGHT)
+                        _self.classed('right', true).classed('wrong', false)
+                    else if (_direction == swing.Direction.LEFT)
+                        _self.classed('wrong', true).classed('right', false)
+                }
+                throwDirection = d.throwDirection
+            })
+
+            // Handle throwing
+            const throwHandler = (d, throwin = true) => {
+                throwDirection = ''
+                const _self = d3.select(d.target),
+                    _dir = d.throwDirection
+                _self.classed('right', false).classed('wrong', false)
+                if (!throwin && _dir == swing.Direction.LEFT) _self.classed('wrongSide', true)
+                else if (!throwin && _dir == swing.Direction.RIGHT) _self.classed('rightSide', true)
+                else _self.classed('wrongSide', false).classed('rightSide', false)
+                $('.att-traena span').text($('.wrongSide').length)
+                $('.behaerskad span').text($('.rightSide').length)
+            }
+            stack.on('throwout', d => throwHandler(d, throwin = false))
+            stack.on('throwin', d => throwHandler(d, throwin = true))
+
+            $(document).off()
+            $(document).on('keydown',e=>{
+                let $lastElement = $(".card-deck li:not(.wrongSide):not(.rightSide)").last();
+                let x = 0, y = Math.floor(Math.random()*21) - 10;
+                let cardEl = $lastElement.get(0)
+                let which = e.which
+                if(cardEl) {
+                    let card = stack.getCard(cardEl)
+                    if (which == 39) {
+                        x = 10
+                    } else if (which == 37) {
+                        x = -10
+                    } else if (which == 32) {
+                        $('.front, .rear').toggle()
+                    } else if (which == 38) {
+                        $(cardEl).find('.increase').click()
+                    } else if (which == 40) {
+                        $(cardEl).find('.decrease').click()
+                    }
+                    if (x) {
+                        card.throwOut(x, y)
+                    }
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

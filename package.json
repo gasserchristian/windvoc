@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express.js": "^1.0.0",
+    "sqlite3": "^5.1.6"
+  },
+  "scripts": {
+    "serve": "node server.js",
+    "b2": "PORT=8010 FILE='data/english-b2.db' node server.js",
+    "bern": "PORT=8020 FILE='data/content.db' node server.js",
+    "c11": "PORT=8030 FILE='data/english-c1.db' node server.js",
+    "c12": "PORT=8040 FILE='data/english-c12.db' node server.js",
+    "c13": "PORT=8050 FILE='data/english-c13.db' node server.js",
+    "mycelium": "PORT=8050 FILE='data/english-mycelium.db' node server.js",
+    "servedev": "nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

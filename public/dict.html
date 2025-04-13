@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <title>Dictionary</title>
+    <style>
+        h3 {
+            margin-top: -70px;
+            padding-top: 70px;
+        }
+        body {
+            padding-top: 70px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-sm bg-light fixed-top">
+        <ul class="navbar-nav">
+        </ul>
+    </nav>
+
+    <div class="container">
+        <input id="filter-auto" class="form-control" type="text" placeholder="Search...">
+    </div>
+
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="dictionary"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Update Item Modal -->
+    <div id="updateItemModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="updateItemModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateItemModalLabel"><span
+                            class="update">Update</span> Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateItemForm">
+                        <div class="form-group">
+                            <label for="updateContent">Content:</label>
+                            <input type="text" class="form-control" id="updateContent" required>
+                        </div>
+                        <div class="form-group" id="form-group-checkboxes">
+                            <label>Type:</label><br>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateLevel">Level:</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-outline-secondary" id="decreaseLevel">-</button>
+                                </div>
+                                <input type="text" class="form-control" id="updateLevel" required>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-secondary" id="increaseLevel">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateDefinition">Definition:</label>
+                            <textarea class="form-control" id="updateDefinition" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateTags">Tags:</label>
+                            <input type="text" class="form-control" id="updateTags">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+                    <button id="updateItemBtnModal" type="button" class="btn btn-primary update">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="./assets/bootstrap3-typeahead-4.0.2.min.js"></script>
+    <script src="./assets/script.js" charset="utf-8"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: './voc/contents',
+                method: 'GET',
+                success: function (data) {
+                    // Group words by starting letter
+                    const groupedWords = groupWordsByLetter(data);
+
+                    // Generate alphabet navigation bar
+                    generateAlphabetNavigation(groupedWords);
+
+                    // Generate dictionary entries
+                    generateDictionaryEntries(groupedWords);
+                }
+            });
+            
+            $('#filter-auto').typeahead({
+                displayText: d=>d.content,
+                source: function (query, process) {
+                    return $.get('./voc/autocomplete', { pattern: query }, function (data) {
+                        return process(data);
+                    });
+                },
+                updater: d=> {
+                    $('body, html').scrollTop($(`#word-${d.id}`).offset().top)
+                    return d.content
+                }
+            });
+
+            function groupWordsByLetter(words) {
+                const grouped = {};
+                words.forEach(wordObj => {
+                    const word = wordObj.content.split(';')[0].trim();
+                    const letter = word.charAt(0).toUpperCase();
+                    if (grouped[letter]) {
+                        grouped[letter].push(wordObj);
+                    } else {
+                        grouped[letter] = [wordObj];
+                    }
+                });
+
+                // Sort the groups alphabetically
+                const sortedGrouped = {};
+                Object.keys(grouped).sort().forEach(letter => {
+                    sortedGrouped[letter] = grouped[letter].sort((a, b) => {
+                        const wordA = a.content.split(';')[0].trim().toLowerCase();
+                        const wordB = b.content.split(';')[0].trim().toLowerCase();
+                        if (wordA < wordB) return -1;
+                        if (wordA > wordB) return 1;
+                        return 0;
+                    });
+                });
+
+                return sortedGrouped;
+            }
+
+            function generateAlphabetNavigation(groupedWords) {
+                const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÅÖ';
+                const navbar = $('.navbar-nav');
+                alphabet.split('').forEach(letter => {
+                    const words = groupedWords[letter] || [];
+                    const classText = words.length > 0 ? '' : 'text-secondary';
+                    const listItem = $('<li>', {
+                        class: 'nav-item'
+                    }).append(
+                        $('<a>', {
+                            class: `nav-link ${classText}`,
+                            href: `#${letter.toLowerCase()}`,
+                            text: letter
+                        })
+                    );
+                    navbar.append(listItem);
+                });
+            }
+
+            function generateDictionaryEntries(groupedWords) {
+                const dictionary = $('#dictionary');
+                for (const letter in groupedWords) {
+                    const words = groupedWords[letter].sort((a, b) => {
+                        const wordA = a.content.split(';')[0].trim().toLowerCase();
+                        const wordB = b.content.split(';')[0].trim().toLowerCase();
+                        if (wordA < wordB) return -1;
+                        if (wordA > wordB) return 1;
+                        return 0;
+                    });
+
+                    const section = $('<section>', {
+                        id: letter.toLowerCase(),
+                        class: 'mb-4'
+                    }).append(
+                        $('<h3>', {
+                            class: 'mb-3',
+                            text: letter
+                        })
+                    );
+                    const list = $('<ul>', {
+                        class: 'list-group'
+                    });
+                    words.forEach(wordObj => {
+                        const word = wordObj.content.split(';')[0].trim();
+                        const id = wordObj.id;
+                        const listItem = $('<li>', {
+                            class: 'list-group-item',
+                            text: word,
+                            click: function () {
+                                modifyRow(id);
+                            },
+                            id: `word-${id}`
+                        });
+                        list.append(listItem);
+                    });
+                    section.append(list);
+                    dictionary.append(section);
+                }
+            }
+            // Callback for modify row
+            function modifyRow(rowId) {
+                console.log('Clicked ID:', rowId);
+                $.ajax({
+                    url: `voc/item/${rowId}`,
+                    method: 'GET',
+                    success: function (data) {
+                        var {content,type,level,definition,tags} = data;
+                        if(type>8) type = 5;
+                        $('#updateItemModal #updateContent').val(content);
+                        $('#updateItemModal input[name="updateType"]').prop('checked', false);
+                        $('#updateItemModal input[name="updateType"]')[parseInt(type) - 1].checked = true;
+                        $('#updateItemModal #updateLevel').val(level);
+                        $('#updateItemModal #updateDefinition').val(definition);
+                        $('#updateItemModal #updateTags').val(tags);
+                        $('#updateItemModal').addClass('update');
+                        $('#updateItemModal').removeClass('create');
+                        $('#updateItemModal').modal('show');
+                        $('#updateItemBtnModal').click(d => sendUpdate(rowId))
+                    }
+                });
+            }
+
+        });
+        // Fill type checkboxes for modal
+        $('#form-group-checkboxes').append(getFormTypeCheckboxes())
+        // Handling PUT
+        function sendUpdate(id) {
+            var content = $('#updateItemModal #updateContent').val();
+            var type = $('#updateItemModal input[name="updateType"]:checked').val();
+            var level = $('#updateItemModal #updateLevel').val();
+            var definition = $('#updateItemModal #updateDefinition').val();
+            var tags = $('#updateItemModal #updateTags').val();
+            var date = 'now';
+
+            var item = {
+                id,
+                content,
+                date,
+                type,
+                level,
+                tags,
+                definition
+            };
+
+            // Send PUT request to create new item
+            $.ajax({
+                url: `/voc/item/${id}`,
+                type: 'PUT',
+                data: JSON.stringify(item),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#updateItemModal').modal('hide');
+                }
+            });
+            $('#updateItemBtnModal').off();
+        }
+    </script>
+</body>
+
+</html>

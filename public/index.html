@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./assets/bootstrap4.0.0.min.css">
+    <link rel="stylesheet" href="./assets/tailwind.2.2.15.min.css">
+    <title>Dashboard</title>
+    <style>
+        #updateItemModal.create .update {
+            display: none;
+        }
+        #updateItemModal.update .create {
+            display: none;
+        }
+        .cross-container {
+            cursor: pointer;
+        }
+        .cross-container:hover::before,
+        .cross-container:hover::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        background-color: black;
+        }
+
+        .cross-container:hover::before {
+        width: 2px;
+        height: 16px;
+        transform: translate(-50%, -50%);
+        }
+
+        .cross-container:hover::after {
+        width: 16px;
+        height: 2px;
+        transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <aside class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-shrink-0">
+            <div class="py-4 text-gray-500 dark:text-gray-400 h-full flex flex-col" bis_skin_checked="1">
+                <a class="ml-6 text-lg font-bold text-gray-800 dark:text-gray-200" href="/">
+                    WindVoc
+                </a>
+                <ul class="mt-6">
+                    <li class="relative px-6 py-3">
+                        <span class="absolute inset-y-0 left-0 w-1 bg-red-600 rounded-tr-lg rounded-br-lg"
+                            aria-hidden="true"></span>
+                        <a class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100"
+                            href="index.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Dashboard</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="cloze.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Cloze</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="cards.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Cards</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="matching.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            <span class="ml-4">Matching</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="dict.html">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                            <span class="ml-4">Dictionary</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="px-6 mt-auto" bis_skin_checked="1">
+                    <button
+                        id="createItemBtn"
+                        class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-red-600 border border-transparent rounded-lg active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-purple">
+                        Add word
+                        <span class="ml-2" aria-hidden="true">+</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+        <!-- Backdrop -->
+        <div class="backdrop bg-black bg-opacity-50 fixed h-full hidden mt-24 w-full"></div>
+
+        <!-- Content area -->
+        <div class="flex flex-col flex-1 w-0 overflow-hidden">
+            <!-- Top navigation -->
+            <header class="w-full py-4 bg-white shadow-md flex">
+                <button class="p-1 ml-1 rounded-md md:hidden focus:outline-none focus:shadow-outline-purple"
+                    aria-label="Menu" id="hamburger">
+                    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                <!-- Insert your top navigation code here -->
+                <div class="flex justify-center flex-1 lg:mr-32" bis_skin_checked="1">
+                    <div class="relative w-full max-w-xl mr-6 focus-within:text-purple-500" bis_skin_checked="1">
+                        <input
+                            class="h-10 w-full pl-2 pr-2 text-gray-700 placeholder-gray-600 bg-gray-100 border-0 rounded-md form-input"
+                            type="text" placeholder="Search for words" aria-label="Search" id="searchWordDict">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 p-4 overflow-y-auto">
+                <!-- KPI section -->
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div class="p-4 bg-white rounded shadow">
+                        <h3 class="text-gray-600 text-sm font-normal">Dictionary size</h3>
+                        <p class="text-xl font-medium" id="kpiDictSize">###</p>
+                    </div>
+                    <div class="p-4 bg-white rounded shadow">
+                        <h3 class="text-gray-600 text-sm font-normal">Median level</h3>
+                        <p class="text-xl font-medium" id="kpiDictMedianLevel">###</p>
+                    </div>
+                    <div class="p-4 bg-white rounded shadow">
+                        <h3 class="text-gray-600 text-sm font-normal">Corpus size</h3>
+                        <p class="text-xl font-medium" id="kpiCorpusCount">###</p>
+                    </div>
+                    <div class="p-4 bg-white rounded shadow">
+                        <h3 class="text-gray-600 text-sm font-normal">Dict to corpus ratio</h3>
+                        <p class="text-xl font-medium" id="kpiRatioDictCorpus">###</p>
+                    </div>
+                </div>
+
+                <div class="mb-4 p-4 bg-white rounded shadow">
+                    <h2 class="text-xl font-medium mb-2">Contributions dictionary</h2>
+                    <svg id="activity-chart" viewBox="0 0 870 155"></svg>
+                </div>
+
+                <div class="mb-4 bg-white rounded shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Content
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Level
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Type
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Corpus
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="dataTable">
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Chart section -->
+                <div class="mb-4 p-4 bg-white rounded shadow">
+                    <h2 class="text-xl font-medium mb-2">Level distribution</h2>
+                    <canvas id="chart"></canvas>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add card modal -->
+    <div id="addItemCorpus" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Item to Corpus</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="corpusForm">
+                        <div class="form-group">
+                            <label for="corpusContent">Content:</label>
+                            <textarea class="form-control" id="corpusContent" rows="6" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger" id="createCorpusItemBtn">Add Item</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+    <script src="./assets/jquery-3.6.0.min.js"></script>
+    <script src="./assets/d3.v6.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="./assets/bootstrap3-typeahead-4.0.2.min.js"></script>
+    <script src="./assets/script.js" charset="utf-8"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize autocompletion research bar
+            $('#searchWordDict').typeahead({
+                displayText: d => d.content,
+                source: function (query, process) {
+                    return $.get('./voc/autocomplete', { pattern: query }, function (data) {
+                        return process(data);
+                    });
+                },
+                updater: d => {
+                    openUpdateModal(d.id)
+                    return d.content
+                }
+            });
+
+            // init add word
+            initModalAddToDict()
+
+            // init data table
+            fetchAndPopulate()
+
+            // Init chart
+            $.ajax({
+                url: './voc/level',
+                method: 'GET',
+                success: function (data) {
+                    const groupedData = d3.group(data, d => d.level);
+                    var countByLevel = Array.from(groupedData).map(([level, group]) => ({
+                        level,
+                        count: group.length
+                    }));
+
+                    countByLevel.sort(function (a, b) {
+                        return d3.ascending(a.level, b.level);
+                    });
+
+                    // Get the minimum and maximum levels from the dataset
+                    var minLevel = d3.min(data, function (d) { return d.level; });
+                    var maxLevel = d3.max(data, function (d) { return d.level; });
+
+                    // Generating range from minLevel to maxLevel
+                    var range = d3.range(minLevel, maxLevel + 1);
+
+                    // Creating an object to hold the counts
+                    var counts = {};
+
+                    // Initialize counts for each level
+                    range.forEach(function (level) {
+                        counts[level] = 0;
+                    });
+
+                    // Update counts with grouped data
+                    countByLevel.forEach(function (item) {
+                        let level = item.level
+                        counts[level] = item.count;
+                    });
+
+                    var ctx = document.getElementById('chart').getContext('2d');
+                    var chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(counts),
+                            datasets: [{
+                                label: 'Occurences',
+                                data: Object.values(counts),
+                                backgroundColor: 'rgb(220,38,38)',
+                                borderColor: 'rgba(220,38,38',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    // Number words KPI
+                    $('#kpiDictSize').text(`${data.length}`)
+
+                    // Median level
+                    $('#kpiDictMedianLevel').text(d3.median(data,d=>d.level))
+                }
+            });
+
+            // Init contribution graph
+            $.ajax({
+                url: './voc/date',
+                method: 'GET',
+                success: function (data) {
+                    initContributionGraph(data)
+                }
+            });
+
+            // put url parameters to all links in menu
+            addParamsToUrl()
+        })
+
+        function openUpdateModal(rowId) {
+            $.ajax({
+                url: `voc/item/${rowId}`,
+                method: 'GET',
+                success: function (data) {
+                    var { content, type, level, definition, tags } = data;
+                    if (type > 8) type = 5;
+                    $('#updateItemModal #updateContent').val(content);
+                    $('#updateItemModal input[name="updateType"]').prop('checked', false);
+                    $('#updateItemModal input[name="updateType"]')[parseInt(type) - 1].checked = true;
+                    $('#updateItemModal #updateLevel').val(level);
+                    $('#updateItemModal #updateDefinition').val(definition);
+                    $('#updateItemModal #updateTags').val(tags);
+                    $('#updateItemModal').addClass('update');
+                    $('#updateItemModal').removeClass('create');
+                    $('#updateItemModal').modal('show');
+                    $('#updateItemDictBtnModal').off()
+                    $('#updateItemDictBtnModal').click(d => sendUpdate(rowId))
+                }
+            });
+        }
+        function initModalAddToDict() {
+            // Add modal
+            $('body').append($(getDictAddUpdateModal()))
+
+            // Add type checkboxes
+            $('#form-group-checkboxes').append(getFormTypeCheckboxes())
+
+            // Add word
+            $('#createItemBtn').click(function () {
+                $('#updateItemModal #updateContent').val('');
+                $('#updateItemModal input[name="updateType"]').prop('checked', false);
+                $('#updateItemModal #updateLevel').val(0);
+                $('#updateItemModal #updateDefinition').val('');
+                $('#updateItemModal #updateTags').val('');
+                $('#updateItemModal').removeClass('update');
+                $('#updateItemModal').addClass('create');
+                $('#updateItemModal').modal('show');
+            });
+            // Create button click event listener
+            $('#createItemDictBtnModal').click(function () {
+                var content = $('#updateItemModal #updateContent').val();
+                var type = $('#updateItemModal input[name="updateType"]:checked').val();
+                var level = $('#updateItemModal #updateLevel').val();
+                var definition = $('#updateItemModal #updateDefinition').val();
+                var tags = $('#updateItemModal #updateTags').val();
+
+                var item = {
+                    content: content,
+                    type: type,
+                    level: level,
+                    definition: definition,
+                    tags: tags
+                };
+
+                // Send POST request to create new item
+                $.ajax({
+                    url: './voc',
+                    type: 'POST',
+                    data: JSON.stringify(item),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        $('#updateItemModal').modal('hide');
+                        item.id = response.id;
+                        item.corpus_count = 0
+                        addRow(item);
+                    }
+                });
+            });
+            // Increase level button click event listener
+            $('#increaseLevel').click(function () {
+                var levelInput = $('#updateItemModal #updateLevel');
+                var level = parseInt(levelInput.val());
+                levelInput.val(level + 1);
+            });
+
+            // Decrease level button click event listener
+            $('#decreaseLevel').click(function () {
+                var levelInput = $('#updateItemModal #updateLevel');
+                var level = parseInt(levelInput.val());
+                if (level > 1) {
+                    levelInput.val(level - 1);
+                }
+            });
+        }
+        // Handling PUT
+        function sendUpdate(id) {
+            var content = $('#updateItemModal #updateContent').val();
+            var type = $('#updateItemModal input[name="updateType"]:checked').val();
+            var level = $('#updateItemModal #updateLevel').val();
+            var definition = $('#updateItemModal #updateDefinition').val();
+            var tags = $('#updateItemModal #updateTags').val();
+            var date = 'now';
+
+            var item = {
+                id,
+                content,
+                date,
+                type,
+                level,
+                tags,
+                definition
+            };
+
+            // Send PUT request to create new item
+            $.ajax({
+                url: `/voc/item/${id}`,
+                type: 'PUT',
+                data: JSON.stringify(item),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#updateItemModal').modal('hide');
+                    //updateRows([item]);
+                }
+            });
+            $('#updateItemBtnModal').off();
+        }
+        function resetDatatable() {
+            const $datatable = $('#dataTable')
+            $datatable.empty()
+        }
+        function fetchAndPopulate(offset=null) {
+            // get the bounds
+            //const bounds = getLevelBounds();
+            const bounds = {}
+
+            if (!offset) offset = 0
+
+            // fetch the data
+            $.ajax({
+                url: './voc',
+                method: 'GET',
+                data: bounds,
+                success: function (data) {
+                    data.filter(d=>d.corpus_count==0).slice(-20).forEach(d=>{
+                        addRow(d)
+                    })
+                    // KPI
+                    let sumCorpus = d3.sum(data, d => d.corpus_count)
+                    let nbWords = data.length
+                    let nbWordsWithCorpus = data.filter(d=>d.corpus_count>0).length
+                    let ratio = d3.format(".2f")(nbWordsWithCorpus/nbWords*100)
+                    $('#kpiCorpusCount').text(sumCorpus)
+                    $('#kpiRatioDictCorpus').text(`${ratio} %`)
+                }
+            });
+        }
+        function addRow(d) {
+            const $datatable = $('#dataTable')
+            $datatable.prepend(
+                $('<tr>').append(
+                    $('<td>', { class: "px-6 py-4 whitespace-nowrap", text: d.content }).click(e => openUpdateModal(d.id)),
+                    $('<td>', { class: "px-6 py-4 whitespace-nowrap", text: d.level }).click(e => openUpdateModal(d.id)),
+                    $('<td>', { class: "px-6 py-4 whitespace-nowrap", text: wordType[d.type] }).click(e => openUpdateModal(d.id)),
+                    $('<td>', { class: "px-6 py-4 whitespace-nowrap" })
+                        .append($(
+                            '<span>',
+                            {
+                                class:"hover:text-transparent relative cross-container font-semibold w-6 h-6 flex items-center justify-center leading-tight text-gray-700 bg-gray-100 rounded-full dark:text-gray-100 dark:bg-gray-700",
+                                text: d.corpus_count
+                            }
+                        )).click(function(){
+                            $('#createCorpusItemBtn').off()
+                            $('#corpusContent').val('')
+                            $('#createCorpusItemBtn').click(e=>{
+                                let content = $('#corpusContent').val()
+                                postNewItemCorpus(d.id,content,$(this))
+                            })
+                            $('#addItemCorpus').modal('show')
+                        })
+                )
+            )
+        }
+        function postNewItemCorpus(id,content,$counter) {
+            let voc_id = id
+            const item = {
+                content,
+                voc_id
+            };
+            // Make an AJAX request to submit the form data
+            $.ajax({
+                url: './corpus',
+                method: 'POST',
+                data: JSON.stringify(item),
+                contentType: 'application/json',
+                success: function (response) {
+                    // Handle the response from the server
+                    console.log(response);
+                    // Close the modal after successful submission
+                    $('#addItemCorpus').modal('hide');
+                    let count = parseInt($counter.text())
+                    $counter.find('span').text(count+1)
+                }
+            });
+        }
+        // Contribution graph
+        function initContributionGraph(sample) {
+            sample.sort((a, b) => new Date(a.day) - new Date(b.day));
+            const dateValues2 = sample.reduce((a, d) => {
+                a[d.day] = d.count
+                return a
+            }, {})
+
+            // Create a date range from January 1st to December 31st of 2023
+            const year = Number(sample[0].day.split('-')[0])
+            const startDate = new Date(Date.UTC(year));
+            const endDate = new Date(Date.UTC(year+1));
+            const dateRange = d3.timeDay.range(startDate, endDate, 1);
+
+            // Complete the array with missing dates and set count to 0
+            const completedData = dateRange.map(date => {
+                const dateString = date.toISOString().slice(0, 10);
+                if (dateValues2[dateString]) {
+                    return { day: d3.timeDay(date), value: Number(dateValues2[dateString]) };
+                } else {
+                    return { day: d3.timeDay(date), value: 0 };
+                }
+            });
+            const dateValues = completedData
+
+            const svg = d3.select("#activity-chart");
+            const { width, height } = document
+                .getElementById("activity-chart")
+                .getBoundingClientRect();
+
+
+            function draw() {
+                const years = Array.from(d3.group(dateValues, d => d.day.getUTCFullYear()))
+                    .map(([key, values]) => ({ key, values }))
+                    .reverse();
+
+                const values = dateValues.map(c => c.value);
+                // const maxValue = d3.quantile(values.sort(d3.ascending), .98) //d3.max(values);
+                const maxValue = d3.max(values) //d3.max(values);
+                const minValue = d3.min(values);
+
+                const cellSize = 15;
+                const yearHeight = cellSize * 7;
+
+                const group = svg.append("g");
+
+                const year = group
+                    .selectAll("g")
+                    .data(years)
+                    .join("g")
+                    .attr(
+                        "transform",
+                        (d, i) => `translate(50, ${yearHeight * i + cellSize * 1.5})`
+                    );
+
+                year
+                    .append("text")
+                    .attr("x", -5)
+                    .attr("y", -30)
+                    .attr("text-anchor", "end")
+                    .attr("font-size", 16)
+                    .attr("font-weight", 550)
+                    .attr("transform", "rotate(270)")
+                    .text(d => d.key);
+
+                const formatDay = d =>
+                    ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][d.getUTCDay()];
+                const countDay = d => d.getUTCDay();
+                const timeWeek = d3.utcSunday;
+                const formatDate = d3.utcFormat("%x");
+                const colorFn = d3
+                    //.scaleSequential(d3.interpolateBuGn)
+                    .scaleSequential(d3.interpolate("#eff4f7", "rgb(220,38,38)"))
+                    .domain([Math.floor(minValue), Math.ceil(maxValue)]);
+                const format = d3.format("+.2%");
+
+                year
+                    .append("g")
+                    .attr("text-anchor", "end")
+                    .selectAll("text")
+                    .data(d3.range(7).map(i => new Date(1995, 0, i)))
+                    .join("text")
+                    .attr("x", -5)
+                    .attr("y", d => (countDay(d) + 0.5) * cellSize)
+                    .attr("dy", "0.31em")
+                    .attr("font-size", 12)
+                    .text(formatDay);
+
+                year
+                    .append("g")
+                    .selectAll("rect")
+                    .data(d => d.values)
+                    .join("rect")
+                    .attr("width", cellSize - 1.5)
+                    .attr("height", cellSize - 1.5)
+                    .attr(
+                        "x",
+                        (d, i) => timeWeek.count(d3.utcYear(d.day), d.day) * cellSize + 10
+                    )
+                    .attr("y", d => countDay(d.day) * cellSize + 0.5)
+                    .attr("fill", d => colorFn(d.value))
+                    .append("title")
+                    .text(d => `${formatDate(d.day)}: ${d.value.toFixed(2)}`);
+
+
+                const months = Array.from(d3.group(dateValues, d => d.day.getUTCMonth()))
+                    .map(([key, values]) => ({
+                        key,
+                        value: values[0].day.toLocaleString("default", { month: "short" }),
+                    }))
+                    .reverse();
+
+
+                const monthLabels = group.select('g')
+                    .selectAll(".month-label")
+                    .data(months)
+                    .join("text")
+                    .attr("class", "month-label")
+                    .attr("x", d => {
+                        const monthStartDate = new Date(Date.UTC(dateValues[0].day.getUTCFullYear(), d.key, 1));
+                        return timeWeek.count(d3.utcYear(monthStartDate), monthStartDate) * cellSize + 10;
+                    })
+                    .attr("y", -10)
+                    .text(d => d.value);
+            }
+            draw();
+        }
+    </script>
+</body>
+
+</html>
