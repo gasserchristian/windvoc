@@ -143,12 +143,27 @@ function buildHistogramLevel(data, lower, upper) {
         .attr('y', d => yScale(d.length))
         .attr('width', d => xScale(d.x1) - xScale(d.x0))
         .attr('height', d => 100 - yScale(d.length))
-        .attr('fill', '#4CAF50')
+        .attr('fill', '#4CAF50');
 
     let lowerValue = upper === undefined ? minValue : lower;
     let upperValue = upper === undefined ? maxValue : upper;
 
     updateHistogram(lowerValue, upperValue);
+
+    // Add a vertical line for the median
+    const median = d3.median(histogramData, d => d.length);
+
+    // Add a vertical line for the median
+    histogramSvg.selectAll('.median-line').remove();
+    histogramSvg.append('line')
+        .attr('class', 'median-line')
+        .attr('y1', yScale(median))
+        .attr('y2', yScale(median))
+        .attr('x1', 0)
+        .attr('x2', 100)
+        .attr('stroke', 'red')
+        .attr('stroke-width', 0.2)
+        .attr('stroke-dasharray', '4 2');
 }
 function updateHistogram(lower, upper) {
     const histogramSvg = d3.select('.histogram');

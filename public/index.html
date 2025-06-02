@@ -234,7 +234,7 @@
     <script src="./assets/d3.v6.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="./assets/bootstrap3-typeahead-4.0.2.min.js"></script>
-    <script src="./assets/script.js" charset="utf-8"></script>
+    <script src="./assets/script.js?v=1.0" charset="utf-8"></script>
     <script>
         $(document).ready(function () {
             // Initialize autocompletion research bar
@@ -500,7 +500,7 @@
                             }
                         )).click(function(){
                             $('#createCorpusItemBtn').off()
-                            $('#corpusContent').val('')
+                            $('#corpusContent').val(`${d.content}: ${d.definition}`)
                             $('#createCorpusItemBtn').click(e=>{
                                 let content = $('#corpusContent').val()
                                 postNewItemCorpus(d.id,content,$(this))
@@ -540,7 +540,7 @@
                 return a
             }, {})
 
-            // Create a date range from January 1st to December 31st of 2023
+            // Create a date range from January 1st to December 31st
             const year = Number(sample[0].day.split('-')[0])
             const startDate = new Date(Date.UTC(year));
             const endDate = new Date(Date.UTC(year+1));
@@ -600,8 +600,9 @@
                 const formatDay = d =>
                     ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][d.getUTCDay()];
                 const countDay = d => d.getUTCDay();
+                const subtractDay = d => new Date(d.getTime() - 86400000)
                 const timeWeek = d3.utcSunday;
-                const formatDate = d3.utcFormat("%x");
+                const formatDate = d3.utcFormat("%d %B %Y");
                 const colorFn = d3
                     //.scaleSequential(d3.interpolateBuGn)
                     .scaleSequential(d3.interpolate("#eff4f7", "rgb(220,38,38)"))
@@ -629,9 +630,9 @@
                     .attr("height", cellSize - 1.5)
                     .attr(
                         "x",
-                        (d, i) => timeWeek.count(d3.utcYear(d.day), d.day) * cellSize + 10
+                        (d, i) => timeWeek.count(d3.utcYear(subtractDay(d.day)), subtractDay(d.day)) * cellSize + 10
                     )
-                    .attr("y", d => countDay(d.day) * cellSize + 0.5)
+                    .attr("y", d => countDay(subtractDay(d.day)) * cellSize + 0.5)
                     .attr("fill", d => colorFn(d.value))
                     .append("title")
                     .text(d => `${formatDate(d.day)}: ${d.value.toFixed(2)}`);
